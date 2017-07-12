@@ -1,0 +1,107 @@
+{
+  "login": {
+    "title": "登录 ng2-admin",
+    "signup_link": "ng2-admin新手? 注册!",
+    "email": "邮箱",
+    "password": "密码",
+    "sign_in": "登录",
+    "forgot_password": "忘记密码?",
+    "sign_from_app_text": "一键登录",
+    "share_on_facebook": "分享到 Facebook",
+    "share_on_twitter": "分享到 Twitter",
+    "share_on_google_plus": "分享到 Google Plus"
+  },
+  "general": {
+    "akveo": "Akveo",
+    "home": "主页",
+    "forms": {
+      "option1": "选择 1"
+    },
+    "menu": {
+      "dashboard": "仪表盘",
+      "editors": "编辑器",
+      "ck_editor": "CKEditor",
+      "components": "组件",
+      "tree_view": "树形视图",
+      "charts": "图表",
+      "chartist_js": "Chartist.Js",
+      "ui_features": "UI 功能",
+      "typography": "排版",
+      "buttons": "按钮",
+      "icons": "图标",
+      "modals": "模型对话框",
+      "grid": "网格",
+      "form_elements": "表单元素",
+      "form_inputs": "表单输入",
+      "form_layouts": "表单布局",
+      "tables": "表格",
+      "basic_tables": "基础表格",
+      "smart_tables": "只能表格",
+      "maps": "地图",
+      "google_maps": "谷歌地图",
+      "leaflet_maps": "Leaflet Maps",
+      "bubble_maps": "Bubble Maps",
+      "line_maps": "Line Maps",
+      "pages": "页面",
+      "login": "登录",
+      "register": "注册",
+      "menu_level_1": "一级菜单1",
+      "menu_level_1_1": "二级菜单1.1",
+      "menu_level_1_2": "二级菜单1.2",
+      "menu_level_1_2_1": "三级菜单1.2.1",
+      "external_link": "外链"
+    },
+    "created_with": "Created with"
+  },
+  "dashboard": {
+    "acquisition_channels": "获客渠道",
+    "users_by_country": "不同国家使用情况",
+    "revenue": "营收",
+    "feed": "反馈",
+    "todo_list": "待办事项",
+    "calendar": "日历",
+    "new_visits": "最近访客",
+    "purchases": "购买",
+    "active_users": "活动用户",
+    "returned": "返修",
+    "popular_app": {
+      "super_app": "超级应用",
+      "most_popular_app": "最受欢迎应用",
+      "total_visits": "总访客",
+      "new_visits": "新访客",
+      "sales": "销售"
+    },
+    "todo": {
+      "task_todo": "待处理任务.."
+    },
+    "traffic_chart": {
+      "view_total": "全部访客"
+    }
+  },
+  "tree_view": {
+    "title": "基础",
+    "programming": "不同编程范式下的不同编程语言",
+    "oop": "面向对象类",
+    "java": "Java",
+    "c_plus_plus": "C++",
+    "c_sharp": "C#",
+    "prototype": "Prototype-based programming",
+    "java_script": "JavaScript",
+    "coffee_script": "CoffeeScript",
+    "lua": "Lua"
+  },
+  "chart": {
+    "lines": "线图",
+    "bars": "柱形图",
+    "simple_line_chart": "简单线图",
+    "line_chart": "Line chart with area",
+    "bi_polar_line_chart": "Bi-polar line chart with area only",
+    "simple_bar_chart": "Simple bar chart",
+    "multi_line_labels_bar_chart": "Multi-line labels bar chart",
+    "stacked_bar_chart": "Stacked bar chart",
+    "pies_and_donuts": "饼状图 & 圆环图",
+    "simple_pie": "饼状图",
+    "pie_with_labels": "带标签的饼状图",
+    "donut": "圆环图"
+  }
+}

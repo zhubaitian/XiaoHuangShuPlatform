@@ -6,7 +6,7 @@ import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { TranslateService } from '@ngx-translate/core';
 
 export function createTranslateLoader(http: Http) {
-    return new TranslateHttpLoader(http, './assets/i18n/US/', '.json');
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 const translationOptions = {
@@ -24,8 +24,11 @@ const translationOptions = {
 })
 export class AppTranslationModule {
   constructor(private translate: TranslateService) {
-    translate.addLangs(["en"]);
+    translate.addLangs(["en", "zh"]);
     translate.setDefaultLang('en');
-    translate.use('en');
+    // translate.use('zh');
+    let browserLang = translate.getBrowserLang();
+    const target = browserLang.match(/en|zh/) ? browserLang : 'en';
+    translate.use(browserLang.match(/en|zh/) ? browserLang : 'en');
   }
 }
