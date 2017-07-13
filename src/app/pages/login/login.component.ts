@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {FormGroup, AbstractControl, FormBuilder, Validators} from '@angular/forms';
+import {FormGroup,FormControl, AbstractControl, FormBuilder, Validators} from '@angular/forms';
 
 import 'style-loader!./login.scss';
 
@@ -10,17 +10,17 @@ import 'style-loader!./login.scss';
 export class Login {
 
   public form:FormGroup;
-  public email:AbstractControl;
+  public user:AbstractControl;
   public password:AbstractControl;
   public submitted:boolean = false;
 
   constructor(fb:FormBuilder) {
     this.form = fb.group({
-      'email': ['', Validators.compose([Validators.required, Validators.minLength(4)])],
+      'user': ['', Validators.compose([Validators.required, Validators.minLength(4)])],
       'password': ['', Validators.compose([Validators.required, Validators.minLength(4)])]
     });
 
-    this.email = this.form.controls['email'];
+    this.user = this.form.controls['user'];
     this.password = this.form.controls['password'];
   }
 

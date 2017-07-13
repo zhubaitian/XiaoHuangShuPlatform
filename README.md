@@ -4,4 +4,4 @@
 
 ---
 
-- Support Chinese Internationalization | 支持中文国际化
+- Customize Login Page | 定制登录页面

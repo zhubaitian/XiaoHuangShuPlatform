@@ -1,8 +1,8 @@
 {
   "login": {
-    "title": "Sign in to ng2-admin",
+    "title": "Sign in to XiaoHuangShu Platform",
     "signup_link": "New to ng2-admin? Sign up!",
-    "email": "Email",
+    "user": "User",
     "password": "Password",
     "sign_in": "Sign in",
     "forgot_password": "Forgot password?",

@@ -1,8 +1,8 @@
 {
   "login": {
-    "title": "登录 ng2-admin",
+    "title": "小黄书管理平台",
     "signup_link": "ng2-admin新手? 注册!",
-    "email": "邮箱",
+    "user": "用户名",
     "password": "密码",
     "sign_in": "登录",
     "forgot_password": "忘记密码?",
