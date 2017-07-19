@@ -19,7 +19,11 @@ import { AppState, InternalStateType } from './app.service';
 import { GlobalState } from './global.state';
 import { NgaModule } from './theme/nga.module';
 import { PagesModule } from './pages/pages.module';
-
+import { HttpService }  from './http.service';
+import { CookieModule } from 'ngx-cookie';
+import {DEBUG_LOGGER_PROVIDERS} from "angular2-logger/core"; //DEBUG LEVEL以上的信息都打印出来
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+// import {ToasterModule} from 'angular2-toaster';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -43,18 +47,24 @@ export type StoreType = {
   ],
   imports: [ // import Angular's modules
     BrowserModule,
+    BrowserAnimationsModule,
     HttpModule,
     RouterModule,
+    CookieModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     NgaModule.forRoot(),
     NgbModule.forRoot(),
     PagesModule,
+    // ToasterModule,
     routing
   ],
   providers: [ // expose our Services and Providers into Angular's dependency injection
     ENV_PROVIDERS,
-    APP_PROVIDERS
+    APP_PROVIDERS,
+    DEBUG_LOGGER_PROVIDERS,
+    HttpService,
+    // ToasterService
   ]
 })
 

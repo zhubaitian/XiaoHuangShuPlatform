@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
+    "declaration": false,
+    "target": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "noEmit": true,
     "noEmitHelpers": true,
     "strictNullChecks": false,
     "lib": [
-      "es2015",
+      "es6",
       "dom"
     ],
     "typeRoots": [
