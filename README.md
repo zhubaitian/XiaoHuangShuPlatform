@@ -623,3 +623,573 @@ export const routing: ModuleWithProviders = RouterModule.forChild(routes);
 
 ---
 >本文由天地会珠海分舵编写，转载需授权，喜欢点个赞，吐槽请评论，进一步交流请关注公众号**techgogogo**或者直接联系本人微信**zhubaitian1**
+
+
+# 第二章 Angularjs 2.0应用的国际化
+
+通过上一章，我们学习了Angularjs 2.0的基础知识以及对ng2-admin后台管理模板有了初步的了解。
+
+这一章我们的计划是让ng2-admin支持上中文语言，并学习ng2的国际化相关知识。
+
+[ngx-translate](https://github.com/ngx-translate/core)是ng2的国际化模块， 我们可以通过其在github上的README来学习该模块的使用。
+
+同时，也可以在线上编辑并体验相关的用法：
+[https://plnkr.co/edit/01UjWY3TKfP6pgwXKuEa?p=preview](https://plnkr.co/edit/01UjWY3TKfP6pgwXKuEa?p=preview)
+
+# 1. ng2国际化模块ngx-translate使用
+---
+## 1.1. 安装
+
+``` shell
+npm install @ngx-translate/core --save
+```
+
+## 1.2. 使用
+
+### 1.2.1. 导入TranslateModule模块
+
+要使用ngx-translate，我们需要引入TranslateModule模块，并在应用的根模块的NgModule修饰器配置选项的imports中导入TranslateModule.forRoot()。以下就是示例代码：
+
+``` js
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+
+@NgModule({
+    imports: [
+        BrowserModule,
+        TranslateModule.forRoot()
+    ],
+    bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+静态方法forRoot是一个约定，它可以让开发人员更轻松的配置模块的provider。通常的做法是在forRoot的参数中传入一个模块的配置对象，然后获得一个配置好的带有Provider配置的Module。比如我们往下可以看到我们可以在TranslateModule.forRoot()中传入一个loader设置来配置该如何加载国际化文件。
+
+>上一章碰到的RouterModule.forRoot就是一个很好的例子。 应用把一个Routes对象传给RouterModule.forRoot，为的就是使用路由配置全应用级的Router服务。 RouterModule.forRoot返回一个[ModuleWithProviders](https://angular.cn/docs/ts/latest/api/core/index/ModuleWithProviders-interface.html)对象。 我们把这个结果添加到根模块AppModule的imports列表中。
+
+>只能在应用的根模块AppModule中调用并导入.forRoot
+的结果。 在其它模块中导入它，特别是惰性加载模块中，是违反设计目标的并会导致一个运行时错误。
+
+>RouterModule也提供了静态方法forChild，用于配置惰性加载模块的路由。
+
+>***forRoot***和***forChild***都是方法的约定名称，它们分别用于在根模块和特性模块中配置服务。
+
+>Angular并不识别这些名字，但是Angular的开发人员可以。 当你写类似的需要可配置的服务提供商时，请遵循这个约定。
+
+### 1.2.2. 配置国际化模块
+
+默认情况下，TranslateModule并没有提供任何加载国际化文件的方式。我们可以自己编写加载器，也可以使用第三方的加载器来达成我们的目标。
+
+比如，我们可以用[TranslateHttpLoader
+](https://github.com/ngx-translate/http-loader)来以http的方式从本地加载我们的国际化文件(假设我们的国际化文件是放在项目根目录的assets/i18n/这个目录下面，一般英文的国际化文件名称会是en.json，中文的是zh.json)。
+
+``` js
+export function createTranslateLoader(http: Http) {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+@NgModule({
+    imports: [
+        BrowserModule,
+        HttpModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: (createTranslateLoader),
+                deps: [Http]
+            }
+        })
+    ],
+    bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+创建TranslateHttpLoader时我们指定了3个参数：
+
+- **http**：代表我们通过http的方式来加载国际化文件。所以在import TranslateHtppLoader之前，我们需要确保先从@angular/http中把Http给import进来
+- **./assets/i18n/**: 目标国际化文件所存放的目录
+- **.json**： 目标国际化文件的后缀。往下可以看到，通过配合TranslateService服务实例的translate.use('en')，我们可以指定加载的是en.json这个文件。
+
+创建好加载器后，我们就可以在TranslateModule.forRoot方法中，通过在参数中配置相应的加载器选项来生成一个配置好的国际化模块。
+
+# 1.2.3. 通过TranslateService加载国际化文件
+
+配置好国际化模块之后，应用就知道去哪里加载我们的国际化文件了。此时我们就可以通过TranslateService这个服务来操作国际化文件的加载了：
+
+``` js
+import {Component} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+
+@Component({
+    selector: 'app',
+    template: `
+        <div>{{ 'HELLO' | translate:param }}</div>
+    `
+})
+export class AppComponent {
+    param = {value: 'world'};
+
+    constructor(translate: TranslateService) {
+        // this language will be used as a fallback when a translation isn't found in the current language
+        translate.setDefaultLang('en');
+
+         // the lang to use, if the lang isn't available, it will use the current loader to get them
+        translate.use('en');
+    }
+}
+```
+
+比如，我们可以通过translate.use('zh')来尝试加载zh.json国际化文件。通过translate.setDefaultLang('en')来设置默认加载的是en.json国际化文件，以便在没有找到zh.json国际化文件时，可以fallback到en.json文件。
+
+## 1.3. 国际化文件编写
+
+我们一般会通过json格式的文件来保存我们需要国际化的子串，比如en.json中：
+
+``` json
+{
+    "HOME": {
+        "HELLO": "hello {{value}}"
+    }
+}
+```
+在需要进行国际化的页面模板代码中，我们可以通过HOME.HELLO的方式直接获取到翻译后的子串。
+
+同时，国际化子串还支持参数化。
+
+比如，这里我们通过{{value}}来指定value这个值是需要在模板代码中传进来的。
+
+## 1.4. 页面模板通过TranslateService进行字串国际化
+
+根据README，我们可以通过服务调用，管道，directive指定这几种方式对字串进行国际化。无论是哪种方式，在对应的component文件中，我们都需要在构造函数中注入TranslateService这个服务的依赖。
+
+- 通过服务调用的方式进行国际化的示例代码如下:
+
+``` js
+translate.get('HELLO', {value: 'world'}).subscribe((res: string) => {
+    console.log(res);
+    //=> 'hello world'
+});
+```
+
+ 需要注意的是，前面提到的需要参数化的value是作为translate.get的第二个参数传进去的。
+
+- 通过管道的方式进行国际化的示例代码：
+
+``` js
+<div>{{ 'HELLO' | translate:param }}</div>
+```
+
+这时需要在对应的component文件中定义好参数化的数据结构param：
+
+``` js
+param = {value: 'world'};
+```
+
+- 通过directive指令的方式进行国际化的示例代码：
+
+``` js
+<div [translate]="'HELLO'" [translateParams]="{value: 'world'}"></div>
+```
+
+或者
+
+``` js
+<div translate [translateParams]="{value: 'world'}">HELLO</div>
+```
+
+# 2. ng2-admin国际化
+---
+ng2-admin管理平台模板默认只提供了英文语言的支持，比如登录界面：
+
+![Login_en.jpeg](http://upload-images.jianshu.io/upload_images/264714-1e524f58d3316845.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+但是，模板代码中已经通过ngx-translate实现了对国际化的支持。
+
+## 2.1. 国际化支持模块
+
+src/app/app.tranlation.module.ts文件就是ng2-admin的国际化支持模块:
+
+``` js
+import { NgModule } from '@angular/core';
+import { Http, HttpModule } from '@angular/http';
+
+import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
+import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { TranslateService } from '@ngx-translate/core';
+
+export function createTranslateLoader(http: Http) {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+const translationOptions = {
+  loader: {
+    provide: TranslateLoader,
+    useFactory: (createTranslateLoader),
+    deps: [Http]
+  }
+};
+
+@NgModule({
+  imports: [TranslateModule.forRoot(translationOptions)],
+  exports: [TranslateModule],
+  providers: [TranslateService]
+})
+export class AppTranslationModule {
+  constructor(private translate: TranslateService) {
+    translate.addLangs(["en"]);
+    translate.setDefaultLang('en');
+    translate.use('en');
+  }
+}
+
+```
+
+代码和第一节的示例基本上是一样的，所以这里就没有必要过多解析了，该模块的最终目的就是通过加载./assets/i18n/en.json文件，实现一个AppTranslationModule。 其他模块通过引入这个模块，就能将对应的需要国际化的字串翻译成en.json中对应的英文字串。
+
+en.json的英文翻译文件内容如下所示：
+
+``` json
+{
+  "login": {
+    "title": "Sign in to ng2-admin",
+    "signup_link": "New to ng2-admin? Sign up!",
+    "email": "Email",
+    "password": "Password",
+    "sign_in": "Sign in",
+    "forgot_password": "Forgot password?",
+    "sign_from_app_text": "or Sign in with one click",
+    "share_on_facebook": "Share on Facebook",
+    "share_on_twitter": "Share on Twitter",
+    "share_on_google_plus": "Share on Google Plus"
+  },
+  "general": {
+    "akveo": "Akveo",
+    "home": "Home",
+    "forms": {
+      "option1": "Option 1"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "editors": "Editors",
+      "ck_editor": "CKEditor",
+      "components": "Components",
+      "tree_view": "Tree View",
+      "charts": "Charts",
+      "chartist_js": "Chartist.Js",
+      "ui_features": "UI Features",
+      "typography": "Typography",
+      "buttons": "Buttons",
+      "icons": "Icons",
+      "modals": "Modals",
+      "grid": "Grid",
+      "form_elements": "Form Elements",
+      "form_inputs": "Form Inputs",
+      "form_layouts": "Form Layouts",
+      "tables": "Tables",
+      "basic_tables": "Basic Tables",
+      "smart_tables": "Smart Tables",
+      "maps": "Maps",
+      "google_maps": "Google Maps",
+      "leaflet_maps": "Leaflet Maps",
+      "bubble_maps": "Bubble Maps",
+      "line_maps": "Line Maps",
+      "pages": "Pages",
+      "login": "Login",
+      "register": "Register",
+      "menu_level_1": "Menu Level 1",
+      "menu_level_1_1": "Menu Level 1.1",
+      "menu_level_1_2": "Menu Level 1.2",
+      "menu_level_1_2_1": "Menu Level 1.2.1",
+      "external_link": "External Link"
+    },
+    "created_with": "Created with"
+  },
+  "dashboard": {
+    "acquisition_channels": "Acquisition Channels",
+    "users_by_country": "Users by Country",
+    "revenue": "Revenue",
+    "feed": "Feed",
+    "todo_list": "To Do List",
+    "calendar": "Calendar",
+    "new_visits": "New Visits",
+    "purchases": "Purchases",
+    "active_users": "Active Users",
+    "returned": "Returned",
+    "popular_app": {
+      "super_app": "Super App",
+      "most_popular_app": "Most Popular App",
+      "total_visits": "Total Visits",
+      "new_visits": "New Visits",
+      "sales": "Sales"
+    },
+    "todo": {
+      "task_todo": "Task to do.."
+    },
+    "traffic_chart": {
+      "view_total": "Views Total"
+    }
+  },
+  "tree_view": {
+    "title": "basic",
+    "programming": "Programming languages by programming paradigm",
+    "oop": "Object-oriented programming",
+    "java": "Java",
+    "c_plus_plus": "C++",
+    "c_sharp": "C#",
+    "prototype": "Prototype-based programming",
+    "java_script": "JavaScript",
+    "coffee_script": "CoffeeScript",
+    "lua": "Lua"
+  },
+  "chart": {
+    "lines": "Lines",
+    "bars": "Bars",
+    "simple_line_chart": "Simple line chart",
+    "line_chart": "Line chart with area",
+    "bi_polar_line_chart": "Bi-polar line chart with area only",
+    "simple_bar_chart": "Simple bar chart",
+    "multi_line_labels_bar_chart": "Multi-line labels bar chart",
+    "stacked_bar_chart": "Stacked bar chart",
+    "pies_and_donuts": "Pies & Donuts",
+    "simple_pie": "Simple Pie",
+    "pie_with_labels": "Pie with labels",
+    "donut": "Donut"
+  }
+}
+
+```
+
+### 2.2. 中文翻译文件zh.json
+
+既然我们需要支持中文的国际化，那么我们首先要做的工作就是提供一个和en.json对应的zh.json中文翻译文件。
+
+注意，这里取名为zh.json是有道理的。因为我们下面通过api在判断浏览器当前语言的时候，如果是中文，返回来的会是zh。
+
+下面就是本人粗糙翻译后的版本，有些不好翻译的就没有翻译了，只是作为个示例而已。
+
+``` json
+{
+  "login": {
+    "title": "登录 ng2-admin",
+    "signup_link": "ng2-admin新手? 注册!",
+    "email": "邮箱",
+    "password": "密码",
+    "sign_in": "登录",
+    "forgot_password": "忘记密码?",
+    "sign_from_app_text": "一键登录",
+    "share_on_facebook": "分享到 Facebook",
+    "share_on_twitter": "分享到 Twitter",
+    "share_on_google_plus": "分享到 Google Plus"
+  },
+  "general": {
+    "akveo": "Akveo",
+    "home": "主页",
+    "forms": {
+      "option1": "选择 1"
+    },
+    "menu": {
+      "dashboard": "仪表盘",
+      "editors": "编辑器",
+      "ck_editor": "CKEditor",
+      "components": "组件",
+      "tree_view": "树形视图",
+      "charts": "图表",
+      "chartist_js": "Chartist.Js",
+      "ui_features": "UI 功能",
+      "typography": "排版",
+      "buttons": "按钮",
+      "icons": "图标",
+      "modals": "模型对话框",
+      "grid": "网格",
+      "form_elements": "表单元素",
+      "form_inputs": "表单输入",
+      "form_layouts": "表单布局",
+      "tables": "表格",
+      "basic_tables": "基础表格",
+      "smart_tables": "只能表格",
+      "maps": "地图",
+      "google_maps": "谷歌地图",
+      "leaflet_maps": "Leaflet Maps",
+      "bubble_maps": "Bubble Maps",
+      "line_maps": "Line Maps",
+      "pages": "页面",
+      "login": "登录",
+      "register": "注册",
+      "menu_level_1": "一级菜单1",
+      "menu_level_1_1": "二级菜单1.1",
+      "menu_level_1_2": "二级菜单1.2",
+      "menu_level_1_2_1": "三级菜单1.2.1",
+      "external_link": "外链"
+    },
+    "created_with": "Created with"
+  },
+  "dashboard": {
+    "acquisition_channels": "获客渠道",
+    "users_by_country": "不同国家使用情况",
+    "revenue": "营收",
+    "feed": "反馈",
+    "todo_list": "待办事项",
+    "calendar": "日历",
+    "new_visits": "最近访客",
+    "purchases": "购买",
+    "active_users": "活动用户",
+    "returned": "返修",
+    "popular_app": {
+      "super_app": "超级应用",
+      "most_popular_app": "最受欢迎应用",
+      "total_visits": "总访客",
+      "new_visits": "新访客",
+      "sales": "销售"
+    },
+    "todo": {
+      "task_todo": "待处理任务.."
+    },
+    "traffic_chart": {
+      "view_total": "全部访客"
+    }
+  },
+  "tree_view": {
+    "title": "基础",
+    "programming": "不同编程范式下的不同编程语言",
+    "oop": "面向对象类",
+    "java": "Java",
+    "c_plus_plus": "C++",
+    "c_sharp": "C#",
+    "prototype": "Prototype-based programming",
+    "java_script": "JavaScript",
+    "coffee_script": "CoffeeScript",
+    "lua": "Lua"
+  },
+  "chart": {
+    "lines": "线图",
+    "bars": "柱形图",
+    "simple_line_chart": "简单线图",
+    "line_chart": "Line chart with area",
+    "bi_polar_line_chart": "Bi-polar line chart with area only",
+    "simple_bar_chart": "Simple bar chart",
+    "multi_line_labels_bar_chart": "Multi-line labels bar chart",
+    "stacked_bar_chart": "Stacked bar chart",
+    "pies_and_donuts": "饼状图 & 圆环图",
+    "simple_pie": "饼状图",
+    "pie_with_labels": "带标签的饼状图",
+    "donut": "圆环图"
+  }
+}
+
+```
+
+下一步我们就需要修改上面的app.tranlation.module.ts的代码：
+
+- 让其默认加载上英文和中文两个翻译文件
+- 默认在找不到目标翻译文件时，使用英文翻译文件
+- 指定希望使用的是中文翻译文件
+
+``` js
+export class AppTranslationModule {
+  constructor(private translate: TranslateService) {
+    translate.addLangs(["en", "zh"]);
+    translate.setDefaultLang('en');
+    translate.use('zh');
+  }
+}
+```
+
+最终，以登录页面为例子，国际化后的呈现时这样的：
+![Login_cn.jpeg](http://upload-images.jianshu.io/upload_images/264714-8f28abacfe78d07e.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+大家可以参考zh.json的翻译文件进行对照查看。
+
+## 2.3. 自动根据浏览器当前语言进行国际化
+
+上面我们是通过指定中文翻译文件来实现中文的国际化的。但是，很多时候我们更希望做到的是，根据浏览器当前的语言进行国际化。
+
+这个时候我们可以修改代码如下:
+
+``` js
+export class AppTranslationModule {
+  constructor(private translate: TranslateService) {
+    translate.addLangs(["en", "zh"]);
+    translate.setDefaultLang('en');
+    let browserLang = translate.getBrowserLang();
+    translate.use(browserLang.match(/en|zh/) ? browserLang : 'en');
+  }
+}
+```
+首先获取浏览器的当前语言，然后设置究竟使用哪个翻译文件进行国际化。
+
+大家可以设置下浏览器的语言分别为中文和英文来体验下修改是否起效。
+
+## 2.4. 页面模板文件翻译方式
+
+最终，我们以登录页面为示例，看下login.html文件里面是如何通过translate服务的指令和管道方式来实现国际化的：
+
+```
+<div class="auth-main">
+  <div class="auth-block">
+    <h1 translate>{{'login.title'}}</h1>
+    <a routerLink="/register" class="auth-link" translate>{{'login.signup_link'}}</a>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+      <div class="form-group row" [ngClass]="{'has-error': (!email.valid && email.touched), 'has-success': (email.valid && email.touched)}">
+        <label for="inputEmail3" class="col-sm-2 control-label" translate>{{'login.email'}}</label>
+
+        <div class="col-sm-10">
+          <input [formControl]="email" type="email" class="form-control" id="inputEmail3" placeholder="{{'login.email' | translate}}">
+        </div>
+      </div>
+      <div class="form-group row" [ngClass]="{'has-error': (!password.valid && password.touched), 'has-success': (password.valid && password.touched)}">
+        <label for="inputPassword3" class="col-sm-2 control-label" translate>{{'login.password'}}</label>
+
+        <div class="col-sm-10">
+          <input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="{{'login.password' | translate}}">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="offset-sm-2 col-sm-10">
+          <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth" translate>{{'login.sign_in'}}</button>
+          <a routerLink="/login" class="forgot-pass" translate>{{'login.forgot_password'}}</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="auth-sep"><span><span translate>{{'login.sign_from_app_text'}}</span></span></div>
+
+    <div class="al-share-auth">
+      <ul class="al-share clearfix">
+        <li><i class="socicon socicon-facebook" title="{{'login.share_on_facebook' | translate}}"></i></li>
+        <li><i class="socicon socicon-twitter" title="{{'login.share_on_twitter' | translate}}"></i></li>
+        <li><i class="socicon socicon-google" title="{{'login.share_on_google_plus' | translate}}"></i></li>
+      </ul>
+    </div>
+  </div>
+</div>
+```
+大家可以参照上面的1.4. 页面模板通过TranslateService进行字串国际化来对比查看，我们这里主要用了其中的两种翻译方式：
+
+- **directive指令方式**: 比如标题的翻译
+``` html
+<h1 translate>{{'login.title'}}</h1>
+```
+- **管道方式**:  比如密码输入框的占位符的翻译:
+``` html
+placeholder="{{'login.password' | translate}}"
+```
+
+# 3. 结语
+---
+
+详细实现请查看github中的代码。
+-  git clone https://github.com/zhubaitian/XiaoHuangShuPlatform.git
+- cd XiaoHuangShuPlatform/
+- git checkout CH01
+
+运行:
+> - npm install
+- npm start
+
+---
+>本文由天地会珠海分舵编写，转载需授权，喜欢点个赞，吐槽请评论，进一步交流请关注公众号**techgogogo**或者直接联系本人微信**zhubaitian1**
+
