@@ -557,7 +557,7 @@ export class Login {
 - 当用户点击提交按钮的时候，代码就会调用登录服务的login接口，将用户名和密码作为参数传过去。登录成功后，将页面导航到dashboard页面
 - 登录失败的时候，通过ToasterService，将失败提示信息显示到登录表单下方，并且希望在10秒后自动消失。
 
-![image.png](http://upload-images.jianshu.io/upload_images/264714-fad5ae235e52a3e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://upload-images.jianshu.io/upload_images/264714-fad5ae235e52a3e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ### 5.1.6. 修改Toaster显示
 
@@ -617,7 +617,7 @@ export class Login {
 
 这时，如果输入的用户名或者密码不对的话，提示Toaster就会变成红色了。
 
-![image.png](http://upload-images.jianshu.io/upload_images/264714-b72204518f7694a2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://upload-images.jianshu.io/upload_images/264714-b72204518f7694a2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 # 6. 结语
 ---
